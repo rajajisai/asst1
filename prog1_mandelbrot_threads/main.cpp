@@ -73,6 +73,12 @@ int main(int argc, char** argv) {
     const int maxIterations = 256;
     int numThreads = 2;
 
+    for (int i = 1; i < argc - 1; ++i) {
+        if (std::string(argv[i]) == "--threads") {
+            numThreads = std::stoi(argv[i + 1]);
+        }
+    }
+
     float x0 = -2;
     float x1 = 1;
     float y0 = -1;
