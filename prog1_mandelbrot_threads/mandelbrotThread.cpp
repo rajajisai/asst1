@@ -34,8 +34,19 @@ void workerThreadStart(WorkerArgs * const args) {
     // to compute a part of the output image.  For example, in a
     // program that uses two threads, thread 0 could compute the top
     // half of the image and thread 1 could compute the bottom half.
-
-    printf("Hello world from thread %d\n", args->threadId);
+    double startTime = CycleTimer::currentSeconds();
+    int startRow = args->threadId * (args->height / args->numThreads);
+    int totalRows = (args->threadId!=args->numThreads-1)?args->height / args->numThreads:args->height - (args->height/ args->numThreads)*(args->numThreads-1);
+    
+    mandelbrotSerial(args->x0, args->y0, args->x1, args->y1,
+                     args->width, args->height,
+                     startRow,
+                     totalRows,
+                     args->maxIterations,
+                     args->output);
+    double endTime = CycleTimer::currentSeconds();
+    printf("Thread %d finished in %f seconds\n", args->threadId, endTime - startTime);
+    // printf("Hello world from thread %d\n", args->threadId);
 }
 
 //
@@ -51,6 +62,7 @@ void mandelbrotThread(
 {
     static constexpr int MAX_THREADS = 32;
 
+    printf("Computing mandelbrot with %d threads\n", numThreads);
     if (numThreads > MAX_THREADS)
     {
         fprintf(stderr, "Error: Max allowed threads is %d\n", MAX_THREADS);
